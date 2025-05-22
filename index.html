@@ -1,11 +1,165 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medidor de Carga</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medidor de Carga</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    #resultado {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #333;
+    }
+    canvas {
+      margin-top: 30px;
+    }
+    #grafico {
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
-    Ola boboca
+  <div class="container">
+    <h1>Simulador - Medidor de Carga</h1>
+    <label for="massa">Massa da esfera (g):</label>
+    <input type="number" id="massa" placeholder="Ex: 1">
+
+    <label for="campo">Campo elétrico (N/C):</label>
+    <input type="number" id="campo" placeholder="Ex: 10000">
+
+    <label for="angulo">Ângulo mínimo detectável (°):</label>
+    <input type="number" id="angulo" placeholder="Ex: 0.1">
+
+    <button onclick="calcularCarga()">Calcular</button>
+    <button onclick="gerarGrafico()">Gerar Gráfico</button>
+
+    <div id="resultado"></div>
+
+    <canvas id="grafico" height="400"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const g = 9.81; // gravidade
+    let chartInstance = null; // guarda o gráfico para atualização
+
+    function calcularCarga() {
+      const massa = parseFloat(document.getElementById('massa').value) / 1000;
+      const campo = parseFloat(document.getElementById('campo').value);
+      const angulo = parseFloat(document.getElementById('angulo').value) * Math.PI / 180;
+
+      if (massa && campo && angulo) {
+        const carga = (massa * g * Math.tan(angulo)) / campo;
+        document.getElementById('resultado').innerText = `Carga mínima detectável: ${carga.toExponential(2)} C`;
+      } else {
+        document.getElementById('resultado').innerText = 'Por favor, preencha todos os campos corretamente.';
+      }
+    }
+
+    function gerarGrafico() {
+      const massa = parseFloat(document.getElementById('massa').value) / 1000;
+      const campo = parseFloat(document.getElementById('campo').value);
+
+      if (!massa || !campo) {
+        alert("Insira massa e campo elétrico para gerar o gráfico.");
+        return;
+      }
+
+      const angulos = [];
+      const cargas = [];
+
+      for (let a = 0.1; a <= 30; a += 0.1) {
+        const rad = a * Math.PI / 180;
+        angulos.push(a);
+        cargas.push((massa * g * Math.tan(rad)) / campo);
+      }
+
+      const ctx = document.getElementById('grafico').getContext('2d');
+
+      // Destroi o gráfico anterior, se existir
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: angulos,
+          datasets: [{
+            label: 'Carga mínima detectável (C)',
+            data: cargas,
+            borderColor: 'blue',
+            fill: false,
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: false,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Carga mínima detectável vs. Ângulo (graus)'
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Ângulo (°)'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Carga (C)'
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
 </body>
 </html>
