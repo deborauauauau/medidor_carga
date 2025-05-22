@@ -6,26 +6,31 @@
   <title>Medidor de Carga</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Courier New', Courier, monospace;
       margin: 0;
       padding: 20px;
-      background-color: #f4f4f4;
+      background-color: #e0f7fa;
+      position: relative;
+      min-height: 100vh;
     }
     .container {
       max-width: 700px;
+      height: auto;
       margin: auto;
       background: #fff;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
     }
     h1 {
       text-align: center;
+      color: #0277bd;
     }
     label {
       display: block;
       margin-top: 15px;
       font-weight: bold;
+      color: #01579b;
     }
     input {
       width: 100%;
@@ -36,16 +41,17 @@
     }
     button {
       margin-top: 20px;
+      margin-right: 10px;
       padding: 10px 20px;
       font-size: 16px;
-      background-color: #28a745;
+      background-color: #0288d1;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
     button:hover {
-      background-color: #218838;
+      background-color: #0277bd;
     }
     #resultado {
       margin-top: 20px;
@@ -54,15 +60,40 @@
     }
     canvas {
       margin-top: 30px;
-    }
-    #grafico {
       width: 100%;
+    }
+    .info-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      text-align: right;
+    }
+    .info-button {
+      background-color: #ffc107;
+      color: #000;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .info-box {
+      display: none;
+      background-color: #fff8e1;
+      border: 1px solid #ffc107;
+      padding: 15px;
+      border-radius: 8px;
+      width: 300px;
+      margin-top: 10px;
+      text-align: left;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Simulador - Medidor de Carga</h1>
+
     <label for="massa">Massa da esfera (g):</label>
     <input type="number" id="massa" placeholder="Ex: 1">
 
@@ -76,14 +107,22 @@
     <button onclick="gerarGrafico()">Gerar Gráfico</button>
 
     <div id="resultado"></div>
-
     <canvas id="grafico" height="400"></canvas>
+  </div>
+
+  <div class="info-container">
+    <button class="info-button" onclick="toggleInfo()">?</button>
+    <div class="info-box" id="infoBox">
+      <p><strong>Como funciona:</strong></p>
+      <p>Este simulador calcula a carga elétrica mínima detectável em uma esfera suspensa entre duas placas carregadas. Quando a esfera tem carga, ela se desloca e forma um ângulo. Utilizando as leis da física (forças elétrica e gravitacional), é possível calcular a carga a partir da massa, do campo elétrico e do ângulo mínimo detectável.</p>
+      <p>Você também pode gerar um gráfico que mostra como a carga varia com o ângulo.</p>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     const g = 9.81; // gravidade
-    let chartInstance = null; // guarda o gráfico para atualização
+    let chartInstance = null;
 
     function calcularCarga() {
       const massa = parseFloat(document.getElementById('massa').value) / 1000;
@@ -118,7 +157,6 @@
 
       const ctx = document.getElementById('grafico').getContext('2d');
 
-      // Destroi o gráfico anterior, se existir
       if (chartInstance) {
         chartInstance.destroy();
       }
@@ -130,7 +168,7 @@
           datasets: [{
             label: 'Carga mínima detectável (C)',
             data: cargas,
-            borderColor: 'blue',
+            borderColor: '#0277bd',
             fill: false,
             tension: 0.1
           }]
@@ -159,6 +197,11 @@
           }
         }
       });
+    }
+
+    function toggleInfo() {
+      const box = document.getElementById('infoBox');
+      box.style.display = box.style.display === 'none' || box.style.display === '' ? 'block' : 'none';
     }
   </script>
 </body>
